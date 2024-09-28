@@ -4,6 +4,7 @@ The `payment` package provides services for interacting with the PayTR payment s
 
 This guide explains how to integrate with the PayTR API and how to use this package.
 
+
 ## Features
 
 - New card payment transactions
@@ -13,6 +14,18 @@ This guide explains how to integrate with the PayTR API and how to use this pack
 - Adding new cards
 - Viewing and deleting saved cards
 - Retrieving BIN (Bank Identification Number) information
+
+
+## Installation
+
+To install the PayTR payment package, use the following `go get` command in the directory containing the go.mod file:
+
+```bash
+go get github.com/streamerd/paytr-go@v1.0.0
+```
+
+This command will download and install version 1.0.0 of the package in your Go workspace.
+
 
 ## Usage
 

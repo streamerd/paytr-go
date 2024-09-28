@@ -14,6 +14,17 @@ Bu kılavuz, PayTR API'si ile nasıl entegre olunacağını ve bu paketin nasıl
 - Kayıtlı kartları görüntüleme ve silme
 - BIN (Bank Identification Number) bilgilerini alma
 
+## Kurulum
+
+PayTR ödeme paketini kurmak için go.mod dosyasının bulunduğu dizinde aşağıdaki `go get` komutunu kullanın:
+
+```bash
+go get github.com/streamerd/paytr-go@v1.0.0
+```
+
+Bu komut, paketin 1.0.0 sürümünü Go çalışma alanınıza indirecek ve kuracaktır.
+
+
 ## Kullanım
 
 ### 1. Konfigürasyon Yapılandırması
