@@ -8,12 +8,6 @@ const (
 	PayTRBaseURL = "https://www.paytr.com"
 )
 
-type PayTRConfig struct {
-	MerchantID   string
-	MerchantKey  string
-	MerchantSalt string
-}
-
 type CommonPaymentRequest struct {
 	MerchantID       string  `json:"merchant_id"`
 	UserIP           string  `json:"user_ip"`
