@@ -31,14 +31,20 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/streamerd/paytr-go/config"
-	domain "github.com/streamerd/paytr-go/types"
+	"github.com/streamerd/paytr-go/domain"
 )
+
+// HTTPClient interface
+type HTTPClient interface {
+	Do(req *http.Request) (*http.Response, error)
+}
 
 // Service defines the operations available for interacting with the PayTR API,
 // including payment processing and card management.
@@ -124,11 +130,16 @@ type Service interface {
 	//   - A PayTRResponse confirming the success or failure of the card deletion process.
 	//   - An error if the card deletion process fails.
 	DeleteSavedCard(utoken, ctoken string) (*domain.PayTRResponse, error)
+	SetHTTPClient(client HTTPClient)
 }
 
 type service struct {
 	config config.PayTRConfig
-	client *http.Client
+	client HTTPClient
+}
+
+func (s *service) SetHTTPClient(client HTTPClient) {
+	s.client = client
 }
 
 // NewService creates a new PayTR service with the provided configuration and repository.
@@ -385,14 +396,25 @@ func (s *service) sendRequest(req interface{}, url string) (*domain.PayTRRespons
 		return nil, err
 	}
 
-	resp, err := s.client.Post(url, "application/json", bytes.NewBuffer(jsonData))
+	httpReq, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
+	if err != nil {
+		return nil, err
+	}
+	httpReq.Header.Set("Content-Type", "application/json")
+
+	resp, err := s.client.Do(httpReq)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
 	var result domain.PayTRResponse
-	err = json.NewDecoder(resp.Body).Decode(&result)
+	err = json.Unmarshal(body, &result)
 	if err != nil {
 		return nil, err
 	}
