@@ -1,47 +1,49 @@
-# PayTR Ödeme Sistemi için payment Paketi
+# Payment Package for PayTR Payment System
 
-`payment` paketi, PayTR ödeme sistemi ile etkileşim sağlamak için hizmetler sunar. Bu paket, kart ödemeleri, tekrarlayan ödemeler, iade işlemleri ve kart yönetimi gibi işlemleri içerir.
+The `payment` package provides services for interacting with the PayTR payment system. This package includes operations such as card payments, recurring payments, refund transactions, and card management.
 
-Bu kılavuz, PayTR API'si ile nasıl entegre olunacağını ve bu paketin nasıl kullanılacağını açıklamaktadır.
+This guide explains how to integrate with the PayTR API and how to use this package.
 
-## Özellikler
 
-- Yeni kart ile ödeme işlemleri
-- Kayıtlı kart ile ödeme işlemleri
-- Tekrarlayan ödeme işlemleri
-- İade işlemleri
-- Yeni kart ekleme
-- Kayıtlı kartları görüntüleme ve silme
-- BIN (Bank Identification Number) bilgilerini alma
+## Features
 
-## Kurulum
+- New card payment transactions
+- Saved card payment transactions
+- Recurring payment transactions
+- Refund transactions
+- Adding new cards
+- Viewing and deleting saved cards
+- Retrieving BIN (Bank Identification Number) information
 
-PayTR ödeme paketini kurmak için go.mod dosyasının bulunduğu dizinde aşağıdaki `go get` komutunu kullanın:
+
+## Installation
+
+To install the PayTR payment package, use the following `go get` command in the directory containing the go.mod file:
 
 ```bash
 go get github.com/streamerd/paytr-go@v1.0.0
 ```
 
-Bu komut, paketin 1.0.0 sürümünü Go çalışma alanınıza indirecek ve kuracaktır.
+This command will download and install version 1.0.0 of the package in your Go workspace.
 
 
-## Kullanım
+## Usage
 
-### 1. Konfigürasyon Yapılandırması
+### 1. Configuration Setup
 
-Öncelikle, PayTR API'si ile etkileşim kurmak için gerekli yapılandırma bilgilerini sağlayan bir `PayTRConfig` yapısını oluşturmalısınız:
+First, you need to create a `PayTRConfig` structure that provides the necessary configuration information to interact with the PayTR API:
 
 ```go
 type PayTRConfig struct {
-    MerchantID   string // Satıcının benzersiz kimliği.
-    MerchantKey  string // HMAC oluşturma için kullanılan gizli anahtar.
-    MerchantSalt string // Token üretiminde güvenliği artırmak için kullanılan salt.
+    MerchantID   string // Unique identifier of the merchant.
+    MerchantKey  string // Secret key used for generating HMAC.
+    MerchantSalt string // Salt used to enhance security in token generation.
 }
 ```
 
-### 2. Yeni Servis Oluşturma
+### 2. Creating a New Service
 
-`payment` paketini kullanarak bir PayTR servisi oluşturabilirsiniz:
+You can create a PayTR service using the `payment` package:
 
 ```go
 svc := payment.NewService(PayTRConfig{
@@ -51,100 +53,100 @@ svc := payment.NewService(PayTRConfig{
 })
 ```
 
-Bu servis, PayTR API'si ile kart işlemleri, iade ve kart yönetimi işlemlerini gerçekleştirmek için kullanılır.
+This service is used to perform card transactions, refunds, and card management operations with the PayTR API.
 
-### 3. Kart ile Ödeme İşlemi
+### 3. Card Payment Transaction
 
-Bir kart ile yeni bir ödeme yapmak için `NewCardPayment` metodunu kullanabilirsiniz:
+To make a new payment with a card, you can use the `NewCardPayment` method:
 
 ```go
 req := domain.NewCardPaymentRequest{
-    // Ödeme isteği verilerini girin
+    // Enter payment request data
 }
 
 resp, err := svc.NewCardPayment(req)
 if err != nil {
-    // Hata işlemleri
+    // Error handling
 }
 ```
 
-### 4. Kayıtlı Kart ile Ödeme İşlemi
+### 4. Saved Card Payment Transaction
 
-Daha önce kaydedilmiş bir kart ile ödeme yapmak için `SavedCardPayment` metodunu kullanabilirsiniz:
+To make a payment with a previously saved card, you can use the `SavedCardPayment` method:
 
 ```go
 req := domain.SavedCardPaymentRequest{
-    // Kayıtlı kart ile ödeme bilgilerini girin
+    // Enter saved card payment information
 }
 
 resp, err := svc.SavedCardPayment(req)
 if err != nil {
-    // Hata işlemleri
+    // Error handling
 }
 ```
 
-### 5. Tekrarlayan Ödeme
+### 5. Recurring Payment
 
-Tekrarlayan ödemeleri işlemek için `RecurringPayment` metodunu kullanabilirsiniz:
+To process recurring payments, you can use the `RecurringPayment` method:
 
 ```go
 req := domain.SavedCardPaymentRequest{
-    // Tekrarlayan ödeme bilgilerini girin
+    // Enter recurring payment information
 }
 
 resp, err := svc.RecurringPayment(req)
 if err != nil {
-    // Hata işlemleri
+    // Error handling
 }
 ```
 
-### 6. İade İşlemi
+### 6. Refund Transaction
 
-Bir ödeme işlemi için iade yapmak amacıyla `RefundPayment` metodunu kullanabilirsiniz:
+To make a refund for a payment transaction, you can use the `RefundPayment` method:
 
 ```go
 req := domain.RefundRequest{
-    MerchantOid:  "işlem-id",
-    ReturnAmount: 100.0, // İade miktarı
+    MerchantOid:  "transaction-id",
+    ReturnAmount: 100.0, // Refund amount
 }
 
 resp, err := svc.RefundPayment(req)
 if err != nil {
-    // Hata işlemleri
+    // Error handling
 }
 ```
 
-### 7. Kart Yönetimi
+### 7. Card Management
 
-- Yeni kart eklemek: `AddNewCard` metodunu kullanarak bir kullanıcı hesabına yeni bir kart ekleyebilirsiniz.
-- Kayıtlı kartları listelemek: `GetSavedCards` metodu, bir kullanıcının kayıtlı kartlarını görüntülemenize olanak tanır.
-- Kayıtlı kartı silmek: `DeleteSavedCard` metodu ile bir kartı silebilirsiniz.
+- Adding a new card: You can add a new card to a user account using the `AddNewCard` method.
+- Listing saved cards: The `GetSavedCards` method allows you to view a user's saved cards.
+- Deleting a saved card: You can delete a card using the `DeleteSavedCard` method.
 
 ```go
-// Yeni kart eklemek
+// Adding a new card
 addCardReq := domain.AddNewCardRequest{
-    // Kart bilgilerini ekleyin
+    // Add card information
 }
 resp, err := svc.AddNewCard(addCardReq)
 
-// Kayıtlı kartları listelemek
+// Listing saved cards
 savedCardsResp, err := svc.GetSavedCards("user-token")
 
-// Kayıtlı kartı silmek
+// Deleting a saved card
 resp, err := svc.DeleteSavedCard("user-token", "card-token")
 ```
 
-### 8. BIN (Kart Numarası) Detayları
+### 8. BIN (Card Number) Details
 
-Bir kartın ilk 6-8 hanesini kullanarak BIN detaylarını almak için `GetBinDetails` metodunu kullanabilirsiniz:
+You can use the `GetBinDetails` method to get BIN details using the first 6-8 digits of a card:
 
 ```go
 binDetails, err := svc.GetBinDetails("123456")
 ```
 
-## HMAC İmza Üretimi
+## HMAC Signature Generation
 
-PayTR API'sine yapılacak isteklerde güvenlik için HMAC kullanılır. İmza, istek verilerinin birleştirilmesi ve SHA-256 ile HMAC oluşturulması yoluyla üretilir. Örneğin:
+HMAC is used for security in requests to the PayTR API. The signature is generated by combining the request data and creating an HMAC with SHA-256. For example:
 
 ```go
 hashStr := fmt.Sprintf("%s%s%.2f", config.MerchantID, req.MerchantOid, req.ReturnAmount)
@@ -153,6 +155,6 @@ hmac.Write([]byte(hashStr))
 signature := base64.StdEncoding.EncodeToString(hmac.Sum(nil))
 ```
 
-## Sonuç
+## Conclusion
 
-Bu paket, PayTR API'si ile kart ödemeleri, iade işlemleri ve kart yönetimi gibi işlemleri kolaylaştırır. Örnek kodlarla açıklanan adımları takip ederek, PayTR ile güvenli ödeme işlemlerini uygulamalarınıza entegre edebilirsiniz.
+This package simplifies operations such as card payments, refund transactions, and card management with the PayTR API. By following the steps explained with example codes, you can integrate secure payment transactions with PayTR into your applications.
